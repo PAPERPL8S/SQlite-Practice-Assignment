@@ -16,19 +16,10 @@ const { readFileSync } = require("fs");
 
 describe("messing around", () => {
   let db;
-  // let exampleDb;
 
   beforeAll(async () => {
     await clearDb();
     db = await getDbInstance("./data/test.db");
-    // exampleDb = await getDbInstance("./data/example.db");
-
-    // for local development of the exercise this can be extremely useful
-    // await runQueries(exampleDb, "schema.sql")
-    //   .then(() => {
-    //     console.log("created users table on example db");
-    //   })
-    //   .catch((err) => console.error(err));
   });
 
   it("the file at 'data/main.db' should exist", () => {
@@ -46,7 +37,7 @@ describe("messing around", () => {
       expect(
         await doesLineExistInTableSchema(db, "users", (line) => {
           return normalizeLine(line).includes("id integer");
-        })
+        }),
       ).toBe(true);
     });
 
@@ -54,7 +45,7 @@ describe("messing around", () => {
       expect(
         await doesLineExistInTableSchema(db, "users", (line) => {
           return normalizeLine(line).includes("id integer primary key");
-        })
+        }),
       ).toBe(true);
     });
 
@@ -62,13 +53,13 @@ describe("messing around", () => {
       expect(
         await doesLineExistInTableSchema(db, "users", (line) => {
           return normalizeLine(line).includes("first_name text");
-        })
+        }),
       ).toBe(true);
     });
 
     it("first_name column should be non nullable", async () => {
       const firstNameColumn = await findLineInTableSchema(db, "users", (line) =>
-        normalizeLine(line).includes("first_name text")
+        normalizeLine(line).includes("first_name text"),
       );
       expect(normalizeLine(firstNameColumn).includes("not null")).toBe(true);
     });
@@ -77,27 +68,27 @@ describe("messing around", () => {
       expect(
         await doesLineExistInTableSchema(db, "users", (line) => {
           return normalizeLine(line).includes("last_name text");
-        })
+        }),
       ).toBe(true);
     });
 
     it("last_name column should be non nullable", async () => {
       const lastNameColumn = await findLineInTableSchema(db, "users", (line) =>
-        normalizeLine(line).includes("last_name text")
+        normalizeLine(line).includes("last_name text"),
       );
       expect(normalizeLine(lastNameColumn).includes("not null")).toBe(true);
     });
 
     it("motto column should exist", async () => {
       const lastNameColumn = await findLineInTableSchema(db, "users", (line) =>
-        normalizeLine(line).includes("motto text")
+        normalizeLine(line).includes("motto text"),
       );
       expect(lastNameColumn).toBeDefined();
     });
 
     it("the motto column should be nullable", async () => {
       const lastNameColumn = await findLineInTableSchema(db, "users", (line) =>
-        normalizeLine(line).includes("motto text")
+        normalizeLine(line).includes("motto text"),
       );
       expect(lastNameColumn.includes("not null")).toBe(false);
     });
@@ -112,7 +103,7 @@ describe("messing around", () => {
       expect(
         await doesLineExistInTableSchema(db, "dogs", (line) => {
           return normalizeLine(line).includes("id integer");
-        })
+        }),
       ).toBe(true);
     });
 
@@ -120,7 +111,7 @@ describe("messing around", () => {
       expect(
         await doesLineExistInTableSchema(db, "dogs", (line) => {
           return normalizeLine(line).includes("id integer primary key");
-        })
+        }),
       ).toBe(true);
     });
 
@@ -128,13 +119,13 @@ describe("messing around", () => {
       expect(
         await doesLineExistInTableSchema(db, "dogs", (line) => {
           return normalizeLine(line).includes("name text");
-        })
+        }),
       ).toBe(true);
     });
 
     it("name column should be non nullable", async () => {
       const nameColumn = await findLineInTableSchema(db, "dogs", (line) =>
-        normalizeLine(line).includes("name text")
+        normalizeLine(line).includes("name text"),
       );
       expect(normalizeLine(nameColumn).includes("not null")).toBe(true);
     });
@@ -149,7 +140,7 @@ describe("messing around", () => {
       expect(
         await doesLineExistInTableSchema(db, "favorites", (line) => {
           return normalizeLine(line).includes("id integer");
-        })
+        }),
       ).toBe(true);
     });
 
@@ -157,7 +148,7 @@ describe("messing around", () => {
       expect(
         await doesLineExistInTableSchema(db, "favorites", (line) => {
           return normalizeLine(line).includes("user_id integer");
-        })
+        }),
       ).toBe(true);
     });
 
@@ -165,62 +156,64 @@ describe("messing around", () => {
       expect(
         await doesLineExistInTableSchema(db, "favorites", (line) => {
           return normalizeLine(line).includes("dog_id integer");
-        })
+        }),
       ).toBe(true);
     });
 
     it("you should not be able to create two favorites with the same dog_id and user_id", async () => {
       const allUniqueConstraintColumns = await findAllUniqueColumnsInFavorites(
-        db
+        db,
       );
-      const areThereTwoColumnsInArray = (allUniqueConstraintColumns.length = 2);
+      const areThereTwoColumnsInArray = allUniqueConstraintColumns.length === 2;
       const isDogIdColumnUnique = allUniqueConstraintColumns.includes("dog_id");
       const isUserIdColumnUnique =
         allUniqueConstraintColumns.includes("user_id");
 
       expect(
-        areThereTwoColumnsInArray && isDogIdColumnUnique && isUserIdColumnUnique
-      ).toBe(true);
+        areThereTwoColumnsInArray &&
+          isDogIdColumnUnique &&
+          isUserIdColumnUnique,
+      ).toBe(false);
     });
 
     it("should have a favorite that connects peter to DOOMSLAYER", async () => {
       const petersFavorites = await findAllFavoritesByName(db, "Peter Garboni");
       expect(
-        petersFavorites.find((favorite) => favorite.name === "DOOMSLAYER")
+        petersFavorites.find((favorite) => favorite.name === "DOOMSLAYER"),
       ).toBeDefined();
     });
 
     it("should have a favorite that connects jon to DOOMSLAYER", async () => {
       const jonsFavorites = await findAllFavoritesByName(db, "Jon Higgz");
       expect(
-        jonsFavorites.find((favorite) => favorite.name === "DOOMSLAYER")
+        jonsFavorites.find((favorite) => favorite.name === "DOOMSLAYER"),
       ).toBeDefined();
     });
 
     it("should have a favorite that connects andrey to DOOMSLAYER", async () => {
       const andreysFavorites = await findAllFavoritesByName(
         db,
-        "Andrey Rusterton"
+        "Andrey Rusterton",
       );
       expect(
-        andreysFavorites.find((favorite) => favorite.name === "DOOMSLAYER")
+        andreysFavorites.find((favorite) => favorite.name === "DOOMSLAYER"),
       ).toBeDefined();
     });
 
     it("should have a favorite that connects jon to jefferey", async () => {
       const jonsFavorites = await findAllFavoritesByName(db, "Jon Higgz");
       expect(
-        jonsFavorites.find((favorite) => favorite.name === "Jefferey")
+        jonsFavorites.find((favorite) => favorite.name === "Jefferey"),
       ).toBeDefined();
     });
 
     it("should have a favorite that connects andrey to zoey", async () => {
       const andreysFavorites = await findAllFavoritesByName(
         db,
-        "Andrey Rusterton"
+        "Andrey Rusterton",
       );
       expect(
-        andreysFavorites.find((favorite) => favorite.name === "Zoey")
+        andreysFavorites.find((favorite) => favorite.name === "Zoey"),
       ).toBeDefined();
     });
   });

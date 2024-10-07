@@ -1,4 +1,4 @@
-# Sqlite Assignment
+
 In this assignment we will build a sqlite database and test that you set it up correctly!
 
 ## Why Sqlite?

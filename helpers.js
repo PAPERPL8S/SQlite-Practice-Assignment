@@ -184,11 +184,12 @@ const findUserByName = async (db, name) => {
 
 const findAllFavoritesByName = async (db, name) => {
   const [_, allFavorites] = await db.all(`
-    SELECT *
-    from favorites
-        join dogs ON favorites.user_id = users.id
-        join users ON favorites.dog_id = dogs.id;
-`);
+    SELECT u.first_name, u.last_name, d.name
+    FROM favorites f
+    JOIN users u ON f.user_id = u.id
+    JOIN dogs d ON f.dog_id = d.id;
+  `);
+
   const [firstName, lastName] = name.split(" ");
   return allFavorites.filter((favorite) => {
     return favorite.first_name === firstName && favorite.last_name === lastName;
